@@ -1,0 +1,67 @@
+﻿@page "/books"
+@namespace Lutfee6510110408.Components.data
+@inject NavigationManager NavigationManager
+@inject IDbContextFactory<BookDbContext> BookDbfactory
+@inject IJSRuntime JSRuntime
+
+<h1>TML Book Store</h1>
+<h6>เป็นร้านเก่าแก่ ที่ขายมังงะการ์ตูนในตำนาน ที่ปัจจุบันเอามาขายบนหน้าเว็บแอพพลิเคชั่น </h6>
+
+@if (books == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <a href="/books/create" class="btn btn-secondary">เพิ่มหนังสือ</a>
+    <div class="container">
+        <div class="card-container">
+            @foreach (var book in books)
+            {
+                <div class="card">
+                    <a href="/books/@book.Id">
+                        <img src="@book.ImageUrl" alt="@book.Title" />
+                    </a>
+                    <div class="card-body">
+                        <h3 class="card-title">@book.Title</h3>
+                        <p class="card-text">ผู้เขียน : @book.Author</p>
+                        <p class="card-text">ปีที่พิมพ์ : @book.Year</p>
+                        <p class="card-text">ราคา : @book.Price บาท</p>
+                        <div class="card-actions">
+                            <a href="/books/edit/@book.Id" class="btn btn-danger">Edit</a>
+                            <button class="btn btn-warning" @onclick="() => DeleteBook(book.Id)">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private List<Book>? books;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var dbcontext = await BookDbfactory.CreateDbContextAsync();
+        books = dbcontext.Book.ToList();
+    }
+
+    private async Task DeleteBook(int bookId)
+    {
+        var confirmDelete = await JSRuntime.InvokeAsync<bool>("confirm", "คุณต้องการลบหนังสือเล่มนี้ใช่หรือไม่?");
+
+        if (confirmDelete)
+        {
+            using var dbContext = BookDbfactory.CreateDbContext();
+            var bookToDelete = dbContext.Book.Find(bookId);
+
+            if (bookToDelete != null)
+            {
+                dbContext.Book.Remove(bookToDelete);
+                await dbContext.SaveChangesAsync();
+                books = dbContext.Book.ToList(); // รีเฟรชรายการหนังสือ
+            }
+        }
+    }
+}

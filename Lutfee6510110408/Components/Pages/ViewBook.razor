@@ -1,0 +1,35 @@
+﻿@page "/books/{id:int}"
+@namespace Lutfee6510110408.Components.data
+@inject BookDbContext DbContext
+
+<h1>@book.Title</h1>
+
+@if (book == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="container">
+        <img src="@book.ImageUrl" alt="@book.Title" />
+        <p><strong>ผู้เขียน : </strong> @book.Author</p>
+        <p><strong>ปีที่พิมพ์ :</strong> @book.Year</p>
+        <p><strong>ราคา : </strong> @book.Price บาท</p>
+        <p><strong>เป็นเรื่องราว : </strong> @book.Description</p>
+        <a href="/books" class="btn btn-warning">ย้อนกลับ</a>
+        <a href="/books/edit/@book.Id" class="btn btn-danger">Edit</a>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Book? book;
+
+    protected override void OnInitialized()
+    {
+        book = DbContext.Book.Find(Id);
+    }
+
+}

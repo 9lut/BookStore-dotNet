@@ -1,0 +1,70 @@
+﻿@page "/books/edit/{id:int}"
+@namespace Lutfee6510110408.Components.data
+@inject NavigationManager NavigationManager
+@inject BookDbContext DbContext
+
+<h1>Edit Book : @book.Title</h1>
+
+@if (book == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <EditForm Model="book" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="Title">Title</label>
+            <InputText id="Title" @bind-Value="book.Title" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="Author">Author</label>
+            <InputText id="Author" @bind-Value="book.Author" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="Description">Description</label>
+            <textarea id="Description" name="Description" cols="" rows="10" class="form-control" @bind="book.Description"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="Year">Year</label>
+            <InputNumber id="Year" @bind-Value="book.Year" class="form-control" min="0" />
+        </div>
+
+        <div class="form-group">
+            <label for="Price">Price</label>
+            <InputNumber id="Price" @bind-Value="book.Price" class="form-control" min="0" />
+        </div>
+
+        <div class="form-group">
+            <label for="ImageUrl">Image URL</label>
+            <InputText id="ImageUrl" @bind-Value="book.ImageUrl" class="form-control" />
+        </div> <br />
+        <button type="submit" class="btn btn-primary">Save Changes</button><br />
+        <a href="/books" class="btn btn-secondary">ยกเลิก</a>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Book? book;
+
+    protected override void OnInitialized()
+    {
+        // ใช้ BookDbContext แทน BookData
+        book = DbContext.Book.Find(Id);
+    }
+
+    private void HandleValidSubmit()
+    {
+        // ทำการบันทึกการแก้ไขลงในฐานข้อมูล
+        DbContext.SaveChanges();
+        NavigationManager.NavigateTo("/books");
+    }
+}

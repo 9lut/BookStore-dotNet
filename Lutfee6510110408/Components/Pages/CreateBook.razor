@@ -1,0 +1,75 @@
+﻿@page "/books/create"
+@namespace Lutfee6510110408.Components.data
+@inject NavigationManager NavigationManager
+@inject IDbContextFactory<BookDbContext> BookDbfactory
+@inherits LayoutComponentBase
+
+<h3>เพิ่มหนังสือ</h3>
+
+<form>
+    <div class="form-group">
+        <label for="title">ชื่อหนังสือ:</label>
+        <input type="text" class="form-control" id="title" @bind="book.Title">
+    </div>
+    <div class="form-group">
+        <label for="author">ผู้เขียน:</label>
+        <input type="text" class="form-control" id="author" @bind="book.Author">
+    </div>
+    <div class="form-group">
+        <label for="description">คำอธิบาย:</label>
+        <textarea class="form-control" id="description" @bind="book.Description"></textarea>
+    </div>
+    <div class="form-group">
+        <label for="year">ปีที่พิมพ์:</label>
+        <input type="number" class="form-control" id="year" @bind="book.Year">
+    </div>
+    <div class="form-group">
+        <label for="price">ราคา:</label>
+        <input type="number" class="form-control" id="price" @bind="book.Price">
+    </div>
+    <div class="form-group">
+        <label for="imageUrl">URL รูปภาพ:</label>
+        <input type="text" class="form-control" id="imageUrl" @bind="book.ImageUrl">
+    </div>
+    <button type="button" class="btn btn-primary" @onclick="AddBook">บันทึก</button>
+    <a href="/books" class="btn btn-secondary">ยกเลิก</a>
+</form>
+
+@if (!IsFormComplete())
+{
+    <p class="text-danger">กรุณากรอกข้อมูลให้ครบทุกช่อง</p>
+}
+
+@code {
+    private Book book = new Book();
+
+    private async Task AddBook()
+    {
+        if (!IsFormComplete())
+        {
+            // ถ้าข้อมูลไม่ครบถ้วน ไม่ทำการบันทึก และแสดงข้อความเตือน
+            return;
+        }
+
+        using var dbContext = BookDbfactory.CreateDbContext();
+
+        // เพิ่มข้อมูล Description ลงใน Books
+        book.Description = book.Description ?? ""; // กรณี Description เป็น null
+
+        dbContext.Book.Add(book);
+        await dbContext.SaveChangesAsync();
+
+        NavigationManager.NavigateTo("/books");
+    }
+
+    private bool IsFormComplete()
+    {
+        // ตรวจสอบว่าข้อมูลทุกช่องถูกกรอกหรือไม่
+        return !string.IsNullOrEmpty(book.Title) &&
+               !string.IsNullOrEmpty(book.Author) &&
+               !string.IsNullOrEmpty(book.Description) &&
+               book.Year > 0 &&
+               book.Price > 0 &&
+               !string.IsNullOrEmpty(book.ImageUrl);
+    }
+}

@@ -1,0 +1,30 @@
+﻿body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 50px;
+}
+
+.about, .animal {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+img {
+    border-radius: 50%;
+    margin-top: 10px;
+}
+
+p {
+    color: #555;
+}
